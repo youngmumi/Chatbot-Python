@@ -1,1 +1,1 @@
-# Chatgpt api를 이용한 챗봇
+# OpenAI api를 이용한 챗봇
