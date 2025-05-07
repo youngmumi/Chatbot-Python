@@ -1,4 +1,5 @@
 import os
+from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -6,6 +7,8 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
 client = OpenAI(api_key=api_key)
+
+app = Flask(__name__)
 
 def chat_with_gpt(prompt):
     try:
@@ -17,12 +20,16 @@ def chat_with_gpt(prompt):
     except Exception as e:
         return f"[오류 발생] {e}"
 
-if __name__ == "__main__":
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() in ["quit", "exit", "bye"]:
-            print("Chatbot: Goodbye!")
-            break
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-        response = chat_with_gpt(user_input)
-        print("Chatbot:", response)
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.get_json()
+    user_message = data.get("message", "")
+    response = chat_with_gpt(user_message)
+    return jsonify({"response": response})
+
+if __name__ == "__main__":
+    app.run(debug=True)
